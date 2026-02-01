@@ -1,0 +1,52 @@
+---
+name: Lint
+
+"on":
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  yamllint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Run yamllint
+        uses: frenck/action-yamllint@v1.5.0
+
+  hadolint:
+    name: Hadolint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: "**/Dockerfile"
+          recursive: true
+          failure-threshold: warning
+
+  addon-linter:
+    name: Add-on Linter (${{ matrix.addon }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        addon:
+          - example-addon
+          - octodns-gui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Run Add-on Linter
+        uses: frenck/action-addon-linter@v2.21.0
+        with:
+          path: "./${{ matrix.addon }}"
